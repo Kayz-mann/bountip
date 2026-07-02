@@ -1,16 +1,15 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 
+import { ProductListScreen } from '@/screens/product-list-screen';
 import { installFetch, jsonResponse } from '@/test-utils/api-mock';
 import { CATEGORY_FIXTURES, PRODUCT_FIXTURES } from '@/test-utils/fixtures';
 import { renderWithProviders } from '@/test-utils/render-with-providers';
 
+// jest.mock is hoisted above the imports above, so the screen picks up the mocked router.
 const mockPush = jest.fn();
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: mockPush, back: jest.fn(), canGoBack: () => true, replace: jest.fn() }),
 }));
-
-// Imported after the mock so the screen picks up the mocked router.
-import { ProductListScreen } from '@/screens/product-list-screen';
 
 describe('ProductListScreen', () => {
   beforeEach(() => mockPush.mockClear());

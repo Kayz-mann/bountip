@@ -18,11 +18,13 @@ function installCatalogue() {
 
 function wrapperFor(store: ReturnType<typeof makeTestStore>) {
   const queryClient = makeTestQueryClient();
-  return ({ children }: { children: ReactNode }) => (
-    <Provider store={store}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </Provider>
-  );
+  return function Wrapper({ children }: { children: ReactNode }) {
+    return (
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      </Provider>
+    );
+  };
 }
 
 describe('useFilteredProducts', () => {
