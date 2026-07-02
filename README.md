@@ -43,11 +43,11 @@ Built with **Expo (SDK 57) + expo-router**, **TypeScript**, **Redux Toolkit**
 
 ## Screenshots
 
-> Add captures to `docs/screenshots/` and they'll render here.
+_Running in Expo Go on an iOS simulator (iPhone 17)._
 
-| List | Details | Search / Empty | Dark mode |
-| ---- | ------- | -------------- | --------- |
-| _list.png_ | _details.png_ | _empty.png_ | _dark.png_ |
+| Product list | Product details | Favourites | Dark mode |
+| --- | --- | --- | --- |
+| <img src="docs/screenshots/list.png" width="200" /> | <img src="docs/screenshots/details.png" width="200" /> | <img src="docs/screenshots/favourites.png" width="200" /> | <img src="docs/screenshots/dark.png" width="200" /> |
 
 ## Tech stack
 
