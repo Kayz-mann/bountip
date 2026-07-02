@@ -3,6 +3,7 @@ import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FavouriteButton } from '@/components/favourite-button';
+import { CategoryChip } from '@/components/product/category-chip';
 import { ProductImage } from '@/components/product/product-image';
 import { RatingStars } from '@/components/product/rating-stars';
 import { ErrorView } from '@/components/state/error-view';
@@ -12,7 +13,7 @@ import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useProduct } from '@/hooks/queries/use-products';
 import { useTheme } from '@/hooks/use-theme';
-import { formatPrice, titleCase } from '@/lib/format';
+import { formatPrice } from '@/lib/format';
 
 export function ProductDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -55,9 +56,7 @@ export function ProductDetailsScreen() {
         </View>
 
         <View style={styles.topRow}>
-          <View style={[styles.chip, { backgroundColor: theme.backgroundSelected }]}>
-            <ThemedText type="small">{titleCase(product.category)}</ThemedText>
-          </View>
+          <CategoryChip category={product.category} />
           <FavouriteButton productId={product.id} size={28} />
         </View>
 
@@ -104,11 +103,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-  },
-  chip: {
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.one,
-    borderRadius: Spacing.four,
   },
   priceRow: {
     flexDirection: 'row',

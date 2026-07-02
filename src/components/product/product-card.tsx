@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { Platform, Pressable, StyleSheet, View } from 'react-native';
 
 import { FavouriteButton } from '@/components/favourite-button';
+import { CategoryChip } from '@/components/product/category-chip';
 import { ProductImage } from '@/components/product/product-image';
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
@@ -39,11 +40,7 @@ function ProductCardComponent({ product, onPress }: ProductCardProps) {
         </ThemedText>
 
         <View style={styles.footer}>
-          <View style={[styles.chip, { backgroundColor: theme.backgroundSelected }]}>
-            <ThemedText type="small" numberOfLines={1}>
-              {titleCase(product.category)}
-            </ThemedText>
-          </View>
+          <CategoryChip category={product.category} />
           <ThemedText type="smallBold">{formatPrice(product.price)}</ThemedText>
         </View>
       </View>
@@ -96,12 +93,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: Spacing.two,
     marginTop: Spacing.one,
-  },
-  chip: {
-    paddingHorizontal: Spacing.two,
-    paddingVertical: Spacing.half,
-    borderRadius: Spacing.four,
-    flexShrink: 1,
   },
   favourite: {
     paddingLeft: Spacing.one,

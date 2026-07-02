@@ -1,11 +1,10 @@
 import * as Network from 'expo-network';
-import { useRouter } from 'expo-router';
-import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CategoryTabs } from '@/components/filters/category-tabs';
 import { SearchBar } from '@/components/filters/search-bar';
-import { ProductCard } from '@/components/product/product-card';
+import { ProductList } from '@/components/product/product-list';
 import { EmptyView } from '@/components/state/empty-view';
 import { ErrorView } from '@/components/state/error-view';
 import { LoadingView } from '@/components/state/loading-view';
@@ -14,13 +13,10 @@ import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useCategories } from '@/hooks/queries/use-products';
 import { useFilteredProducts } from '@/hooks/use-filtered-products';
-import { useTheme } from '@/hooks/use-theme';
 import { selectActiveCategory, selectSearch, setCategory, setSearch } from '@/store/filters-slice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 export function ProductListScreen() {
-  const router = useRouter();
-  const theme = useTheme();
   const insets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
 
@@ -70,27 +66,11 @@ export function ProductListScreen() {
     }
 
     return (
-      <FlatList
-        data={products}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => (
-          <ProductCard
-            product={item}
-            onPress={(id) => router.push({ pathname: '/product/[id]', params: { id: String(id) } })}
-          />
-        )}
+      <ProductList
+        products={products}
         contentContainerStyle={styles.listContent}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-        keyboardDismissMode="on-drag"
-        keyboardShouldPersistTaps="handled"
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefetching}
-            onRefresh={() => refetch()}
-            tintColor={theme.text}
-            colors={[theme.text]}
-          />
-        }
+        refreshing={isRefetching}
+        onRefresh={() => refetch()}
       />
     );
   };
@@ -117,8 +97,5 @@ const styles = StyleSheet.create({
   },
   listContent: {
     padding: Spacing.three,
-  },
-  separator: {
-    height: Spacing.three,
   },
 });
