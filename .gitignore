@@ -41,3 +41,10 @@ example
 # generated native folders
 /ios
 /android
+
+# AI assistant / agents
+.claude/
+
+# Markdown files (keep READMEs only)
+*.md
+!README.md
