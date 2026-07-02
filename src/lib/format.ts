@@ -12,5 +12,7 @@ export function formatPrice(price: number | null | undefined): string {
  * upstream "jewelery" spelling is preserved.
  */
 export function titleCase(value: string): string {
-  return value.replace(/\b\w/g, (char) => char.toUpperCase());
+  // Capitalize the first letter of each whitespace-separated word only, so
+  // apostrophes stay lowercase ("men's clothing" -> "Men's Clothing").
+  return value.replace(/(^|\s)(\w)/g, (_, separator, char) => separator + char.toUpperCase());
 }
