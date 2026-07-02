@@ -2,6 +2,13 @@
 // Test environment setup. The jest-expo preset mocks most Expo/React Native
 // native modules; app-specific mocks live here.
 
+// Render FlashList as a plain FlatList in tests so rows appear without native
+// layout measurement (behaviour is identical for these tests).
+jest.mock('@shopify/flash-list', () => {
+  const { FlatList } = require('react-native');
+  return { FlashList: FlatList };
+});
+
 // Official AsyncStorage jest mock — backs redux-persist and the react-query persister.
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),

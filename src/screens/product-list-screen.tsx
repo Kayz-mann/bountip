@@ -96,6 +96,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
   },
   listContent: {
-    padding: Spacing.three,
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.three,
   },
 });

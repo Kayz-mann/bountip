@@ -18,13 +18,17 @@ export function FavouritesScreen() {
   const products = (data ?? []).filter((product) => favouriteIds.includes(product.id));
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={[styles.container, { paddingTop: insets.top }]}>
       {products.length === 0 ? (
         <EmptyView variant="favourites" />
       ) : (
         <ProductList
           products={products}
-          contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + Spacing.four }]}
+          contentContainerStyle={{
+            paddingHorizontal: Spacing.three,
+            paddingTop: Spacing.three,
+            paddingBottom: insets.bottom + Spacing.four,
+          }}
         />
       )}
     </ThemedView>
@@ -34,8 +38,5 @@ export function FavouritesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  listContent: {
-    padding: Spacing.three,
   },
 });
