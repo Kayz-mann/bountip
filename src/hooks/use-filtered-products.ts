@@ -32,6 +32,7 @@ export function useFilteredProducts() {
     error: query.error,
     refetch: query.refetch,
     isRefetching: query.isRefetching,
+    dataUpdatedAt: query.dataUpdatedAt,
     hasData: all.length > 0,
     isFiltering: normalizedSearch.length > 0 || activeCategory != null,
     /** Raw (un-normalized) search text, for display in the empty state. */
