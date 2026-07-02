@@ -12,16 +12,33 @@ Built with **Expo (SDK 57) + expo-router**, **TypeScript**, **Redux Toolkit**
 
 ## Features
 
-- **Product list** — image, title, price, category and a description preview, in a fast `FlatList`.
-- **Product details** — full image, title, description, price, category and star rating.
-- **Search** — debounced, case-insensitive title search.
-- **Category filter** — horizontal, scrollable category tabs (plus an "All" tab).
-- **Every feedback state** — initial loading (skeletons), empty search, empty catalogue, API error with retry, and pull-to-refresh.
+**Browse & discover**
+
+- **Product list** — a fast `FlatList` of cards showing image, title, price, a category chip and a description preview.
+- **Product details** — full image, title, description, price, category and a star rating (with half-stars).
+- **Search** — debounced, case-insensitive search by title.
+- **Category filtering** — horizontal, scrollable category tabs with an "All" option.
+
+**Reliable feedback states**
+
+- **Initial loading** — skeleton cards sized to match the real rows (no layout shift).
+- **Empty states** — distinct copy for no search results, an empty catalogue, and empty favourites.
+- **Error handling** — a typed error layer tells offline apart from server and parse errors, with a Retry that actually recovers.
+- **Not found** — an unknown product id shows a dedicated screen instead of an endless retry (see [API](#api)).
+- **Pull-to-refresh** — refetch the catalogue from the list.
+
+**Performance & offline**
+
+- **Image caching** — persistent disk caching, so images never re-download on scroll or revisit, and recycled rows never flash the wrong image (see [Image caching](#image-caching)).
+- **Offline reads** — the catalogue is cached and browsable offline, with a dismissible offline banner.
 - **Favourites** — a dedicated tab, persisted across launches.
+
+**Polish & quality**
+
 - **Dark mode** — follows the system appearance.
-- **Offline-friendly** — the catalogue is cached and readable offline, with an offline banner.
-- **Accessible** — roles, labels and selected-state on every interactive element.
-- **Tested** — unit + integration tests (Jest + React Native Testing Library) and a green CI pipeline.
+- **Haptics** — light feedback on category selection and favourite toggles.
+- **Accessibility** — roles, labels and selected-state on every interactive element.
+- **Tested & linted** — 24 unit + integration tests (Jest + RNTL), TypeScript strict, and a CI pipeline.
 
 ## Screenshots
 
@@ -41,7 +58,7 @@ Built with **Expo (SDK 57) + expo-router**, **TypeScript**, **Redux Toolkit**
 | Server state      | TanStack React Query (+ AsyncStorage persistence)  |
 | Client state      | Redux Toolkit (`createSlice`) + redux-persist      |
 | Data fetching     | `fetch` with a typed error layer (no axios)        |
-| Images            | expo-image (disk cache)                            |
+| Images            | expo-image (memory-disk cache + recycling)         |
 | Testing           | Jest, React Native Testing Library                 |
 | Tooling           | ESLint (eslint-config-expo), GitHub Actions        |
 
@@ -109,6 +126,30 @@ src/
   types/               # Product domain types + runtime guard
   test-utils/          # renderWithProviders, fixtures, fetch mocks
 ```
+
+### Image caching
+
+Product images render through a small `ProductImage` wrapper around `expo-image`,
+tuned for a scrolling catalogue:
+
+- **`cachePolicy="memory-disk"`** — images are cached to disk, so they are never
+  re-downloaded when you scroll back or reopen a product. The first view hits the
+  network; every view after that is instant, online or offline. This is the core
+  of the caching system.
+- **`recyclingKey={product.id}`** — as `FlatList` recycles row views during
+  scrolling, this key resets the image so a recycled card never briefly shows the
+  previous product's picture.
+- **`transition`** — a short fade-in as each image resolves.
+- **Themed placeholder** — the image area uses `theme.backgroundElement` as its
+  background, so nothing flashes white in dark mode before the image loads.
+- **`onError` fallback** — Fake Store image URLs occasionally 404; the wrapper
+  falls back to the neutral placeholder rather than rendering a broken image.
+
+**Deliberately not built:** a manual `expo-file-system` cache with signed-URL
+refresh logic. That layer only earns its place when an API serves *expiring*
+(e.g. pre-signed S3) URLs — Fake Store serves static, public URLs, so
+`expo-image`'s built-in disk cache is the whole story. Keeping it lean is a
+conscious call, in line with the brief's "avoid over-engineering" guidance.
 
 ## API
 
