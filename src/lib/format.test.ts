@@ -9,6 +9,10 @@ describe('formatPrice', () => {
     expect(formatPrice(168)).toBe('$168.00');
   });
 
+  it('groups thousands', () => {
+    expect(formatPrice(1234.5)).toBe('$1,234.50');
+  });
+
   it('falls back to a dash for missing or invalid values', () => {
     expect(formatPrice(undefined)).toBe('—');
     expect(formatPrice(null)).toBe('—');
