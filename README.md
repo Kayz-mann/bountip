@@ -14,7 +14,7 @@ Built with **Expo (SDK 57) + expo-router**, **TypeScript**, **Redux Toolkit**
 
 **Browse & discover**
 
-- **Product list** — a fast, recycling `FlashList` of cards showing image, title, price, a category chip and a description preview.
+- **Product list** — a fast `FlatList` of cards showing image, title, price, a category chip and a description preview.
 - **Infinite scroll** — the list pages in more products as you scroll (client-side, via TanStack `useInfiniteQuery`; see [Pagination](#pagination)).
 - **Product details** — full image, title, description, price, category and a star rating (with half-stars).
 - **Search** — debounced, case-insensitive search by title.
@@ -159,7 +159,7 @@ one response and ignores `offset`, `skip` and `page` (verified with curl). So th
 list uses **client-side pagination** with TanStack `useInfiniteQuery`:
 
 - The full catalogue is fetched **once** (through `fetchQuery` against the shared
-  products cache), then revealed in pages of 6 as the user scrolls (`FlashList`
+  products cache), then revealed in pages of 6 as the user scrolls (`FlatList`
   `onEndReached`), with a footer spinner while the next page appears.
 - **Filtering runs on the complete set**, not just loaded pages, so search and
   category filters never miss items that a naive paginated approach would hide on

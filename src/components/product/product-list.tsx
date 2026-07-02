@@ -1,6 +1,13 @@
-import { FlashList, type FlashListProps } from '@shopify/flash-list';
 import { useRouter } from 'expo-router';
-import { ActivityIndicator, RefreshControl, StyleSheet, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 
 import { ProductCard } from '@/components/product/product-card';
 import { Spacing } from '@/constants/theme';
@@ -9,7 +16,7 @@ import type { Product } from '@/types/product';
 
 interface ProductListProps {
   products: Product[];
-  contentContainerStyle?: FlashListProps<Product>['contentContainerStyle'];
+  contentContainerStyle?: StyleProp<ViewStyle>;
   onRefresh?: () => void;
   refreshing?: boolean;
   /** Called near the end of the list to load the next page. */
@@ -20,8 +27,8 @@ interface ProductListProps {
 
 /**
  * Scrollable list of product cards with tap-to-details navigation and infinite
- * paging. Uses FlashList for recycling-based performance. Shared by the
- * catalogue and favourites screens so the row layout and navigation stay in sync.
+ * paging. Shared by the catalogue and favourites screens so the row layout and
+ * navigation stay in sync.
  */
 export function ProductList({
   products,
@@ -35,42 +42,40 @@ export function ProductList({
   const theme = useTheme();
 
   return (
-    <View style={styles.fill}>
-      <FlashList
-        data={products}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => (
-          <ProductCard
-            product={item}
-            onPress={(id) => router.push({ pathname: '/product/[id]', params: { id: String(id) } })}
+    <FlatList
+      data={products}
+      keyExtractor={(item) => String(item.id)}
+      renderItem={({ item }) => (
+        <ProductCard
+          product={item}
+          onPress={(id) => router.push({ pathname: '/product/[id]', params: { id: String(id) } })}
+        />
+      )}
+      contentContainerStyle={contentContainerStyle}
+      ItemSeparatorComponent={Separator}
+      showsVerticalScrollIndicator={false}
+      keyboardDismissMode="on-drag"
+      keyboardShouldPersistTaps="handled"
+      onEndReached={onEndReached}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={
+        loadingMore ? (
+          <View style={styles.footer}>
+            <ActivityIndicator color={theme.text} />
+          </View>
+        ) : null
+      }
+      refreshControl={
+        onRefresh ? (
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={theme.text}
+            colors={[theme.text]}
           />
-        )}
-        contentContainerStyle={contentContainerStyle}
-        ItemSeparatorComponent={Separator}
-        showsVerticalScrollIndicator={false}
-        keyboardDismissMode="on-drag"
-        keyboardShouldPersistTaps="handled"
-        onEndReached={onEndReached}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={
-          loadingMore ? (
-            <View style={styles.footer}>
-              <ActivityIndicator color={theme.text} />
-            </View>
-          ) : null
-        }
-        refreshControl={
-          onRefresh ? (
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor={theme.text}
-              colors={[theme.text]}
-            />
-          ) : undefined
-        }
-      />
-    </View>
+        ) : undefined
+      }
+    />
   );
 }
 
@@ -79,9 +84,6 @@ function Separator() {
 }
 
 const styles = StyleSheet.create({
-  fill: {
-    flex: 1,
-  },
   separator: {
     height: Spacing.three,
   },
