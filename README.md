@@ -14,7 +14,8 @@ Built with **Expo (SDK 57) + expo-router**, **TypeScript**, **Redux Toolkit**
 
 **Browse & discover**
 
-- **Product list** — a fast `FlatList` of cards showing image, title, price, a category chip and a description preview.
+- **Product list** — a fast, recycling `FlashList` of cards showing image, title, price, a category chip and a description preview.
+- **Infinite scroll** — the list pages in more products as you scroll (client-side, via TanStack `useInfiniteQuery`; see [Pagination](#pagination)).
 - **Product details** — full image, title, description, price, category and a star rating (with half-stars).
 - **Search** — debounced, case-insensitive search by title.
 - **Category filtering** — horizontal, scrollable category tabs with an "All" option.
@@ -151,6 +152,22 @@ refresh logic. That layer only earns its place when an API serves *expiring*
 `expo-image`'s built-in disk cache is the whole story. Keeping it lean is a
 conscious call, in line with the brief's "avoid over-engineering" guidance.
 
+### Pagination
+
+The Fake Store API has no server-side pagination — it returns all ~20 products in
+one response and ignores `offset`, `skip` and `page` (verified with curl). So the
+list uses **client-side pagination** with TanStack `useInfiniteQuery`:
+
+- The full catalogue is fetched **once** (through `fetchQuery` against the shared
+  products cache), then revealed in pages of 6 as the user scrolls (`FlashList`
+  `onEndReached`), with a footer spinner while the next page appears.
+- **Filtering runs on the complete set**, not just loaded pages, so search and
+  category filters never miss items that a naive paginated approach would hide on
+  unfetched pages. Changing a filter resets paging to the first page.
+
+This keeps the infinite-scroll UX and real `useInfiniteQuery` semantics while
+being honest about the API: no redundant network calls, and complete search results.
+
 ## API
 
 The app uses the public [Fake Store API](https://fakestoreapi.com). Three
@@ -247,7 +264,6 @@ The brief explicitly warns against over-engineering, so these were conscious "no
 | Not done                        | Why                                                   |
 | ------------------------------- | ----------------------------------------------------- |
 | RTK Query / axios interceptors  | Nothing to intercept; duplicates React Query          |
-| Pagination / infinite scroll    | The API returns a fixed ~20 items                     |
 | `zod` schema validation         | A tiny `isProduct` runtime guard covers the real risk |
 | NativeWind / a design system    | The scaffold already ships a working theme            |
 | Manual `useMemo` / `useCallback`| React Compiler is enabled                             |
@@ -269,7 +285,7 @@ The brief explicitly warns against over-engineering, so these were conscious "no
 - **Categories include the upstream `jewelery` typo.** Tabs display a title-cased label but filter on the raw key, so the typo is preserved on purpose (breaking it would break filtering).
 - **Ratings can be missing.** `product.rating` is treated as optional everywhere.
 - **Offline is best-effort.** After a first successful load the catalogue is cached (24h); a *cold* first launch with no network shows the error/retry state.
-- **Search/filtering are client-side** given the API's constraints and small payload.
+- **Search, filtering and pagination are client-side** given the API's constraints (no title-search, no offset/page) and small payload — see [Pagination](#pagination).
 
 ## License
 
