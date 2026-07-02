@@ -23,8 +23,19 @@ export function ProductListScreen() {
   const search = useAppSelector(selectSearch);
   const activeCategory = useAppSelector(selectActiveCategory);
   const categoriesQuery = useCategories();
-  const { products, isLoading, isError, error, refetch, isRefetching, dataUpdatedAt, hasData, isFiltering } =
-    useFilteredProducts();
+  const {
+    products,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    isRefetching,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    dataUpdatedAt,
+    isFiltering,
+  } = useFilteredProducts();
 
   const network = Network.useNetworkState();
   const isOffline = network.isConnected === false;
@@ -54,7 +65,7 @@ export function ProductListScreen() {
 
   const renderBody = () => {
     if (isLoading) return <LoadingView />;
-    if (isError && !hasData) return <ErrorView error={error} onRetry={() => refetch()} />;
+    if (isError && products.length === 0) return <ErrorView error={error} onRetry={() => refetch()} />;
     if (products.length === 0) {
       return (
         <EmptyView
@@ -71,13 +82,15 @@ export function ProductListScreen() {
         contentContainerStyle={styles.listContent}
         refreshing={isRefetching}
         onRefresh={() => refetch()}
+        onEndReached={hasNextPage ? () => fetchNextPage() : undefined}
+        loadingMore={isFetchingNextPage}
       />
     );
   };
 
   return (
     <ThemedView style={[styles.container, { paddingTop: insets.top }]}>
-      {isOffline && hasData ? <OfflineBanner updatedAt={dataUpdatedAt} /> : null}
+      {isOffline && products.length > 0 ? <OfflineBanner updatedAt={dataUpdatedAt} /> : null}
       {header}
       {renderBody()}
     </ThemedView>

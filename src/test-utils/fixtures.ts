@@ -32,3 +32,16 @@ export const PRODUCT_FIXTURES: Product[] = [
 ];
 
 export const CATEGORY_FIXTURES: string[] = ["men's clothing", 'jewelery', 'electronics'];
+
+/** Generates `count` simple products, for exercising pagination. */
+export function makeProducts(count: number): Product[] {
+  return Array.from({ length: count }, (_, index) => ({
+    id: index + 1,
+    title: `Product ${index + 1}`,
+    price: 10 + index,
+    description: 'A generated test product.',
+    category: 'electronics',
+    image: `https://fakestoreapi.com/img/${index + 1}.jpg`,
+    rating: { rate: 4, count: 10 },
+  }));
+}

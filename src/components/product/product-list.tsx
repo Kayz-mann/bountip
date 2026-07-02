@@ -1,6 +1,6 @@
 import { FlashList, type FlashListProps } from '@shopify/flash-list';
 import { useRouter } from 'expo-router';
-import { RefreshControl, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, RefreshControl, StyleSheet, View } from 'react-native';
 
 import { ProductCard } from '@/components/product/product-card';
 import { Spacing } from '@/constants/theme';
@@ -12,14 +12,25 @@ interface ProductListProps {
   contentContainerStyle?: FlashListProps<Product>['contentContainerStyle'];
   onRefresh?: () => void;
   refreshing?: boolean;
+  /** Called near the end of the list to load the next page. */
+  onEndReached?: () => void;
+  /** Shows a footer spinner while the next page loads. */
+  loadingMore?: boolean;
 }
 
 /**
- * Scrollable list of product cards with tap-to-details navigation. Uses FlashList
- * for recycling-based performance. Shared by the catalogue and favourites screens
- * so the row layout and navigation stay in sync.
+ * Scrollable list of product cards with tap-to-details navigation and infinite
+ * paging. Uses FlashList for recycling-based performance. Shared by the
+ * catalogue and favourites screens so the row layout and navigation stay in sync.
  */
-export function ProductList({ products, contentContainerStyle, onRefresh, refreshing = false }: ProductListProps) {
+export function ProductList({
+  products,
+  contentContainerStyle,
+  onRefresh,
+  refreshing = false,
+  onEndReached,
+  loadingMore = false,
+}: ProductListProps) {
   const router = useRouter();
   const theme = useTheme();
 
@@ -39,6 +50,15 @@ export function ProductList({ products, contentContainerStyle, onRefresh, refres
         showsVerticalScrollIndicator={false}
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
+        onEndReached={onEndReached}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          loadingMore ? (
+            <View style={styles.footer}>
+              <ActivityIndicator color={theme.text} />
+            </View>
+          ) : null
+        }
         refreshControl={
           onRefresh ? (
             <RefreshControl
@@ -64,5 +84,8 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: Spacing.three,
+  },
+  footer: {
+    paddingVertical: Spacing.four,
   },
 });
