@@ -110,6 +110,80 @@ src/
   test-utils/          # renderWithProviders, fixtures, fetch mocks
 ```
 
+## API
+
+The app uses the public [Fake Store API](https://fakestoreapi.com). Three
+endpoints cover every screen — each is reproducible with `curl`. Responses below
+are real (captured from the live API).
+
+### List products — `GET /products`
+
+```bash
+curl -s "https://fakestoreapi.com/products?limit=2"
+```
+
+```json
+[
+  {
+    "id": 1,
+    "title": "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
+    "price": 109.95,
+    "description": "Your perfect pack for everyday use and walks in the forest. ...",
+    "category": "men's clothing",
+    "image": "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_t.png",
+    "rating": { "rate": 3.9, "count": 120 }
+  }
+]
+```
+
+### Single product — `GET /products/{id}`
+
+```bash
+curl -s https://fakestoreapi.com/products/1
+```
+
+```json
+{
+  "id": 1,
+  "title": "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
+  "price": 109.95,
+  "description": "Your perfect pack for everyday use and walks in the forest. ...",
+  "category": "men's clothing",
+  "image": "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_t.png",
+  "rating": { "rate": 3.9, "count": 120 }
+}
+```
+
+### Categories — `GET /products/categories`
+
+```bash
+curl -s https://fakestoreapi.com/products/categories
+```
+
+```json
+["electronics", "jewelery", "men's clothing", "women's clothing"]
+```
+
+Note the upstream `jewelery` spelling — the app displays a title-cased label but
+keeps the raw string as the filter key.
+
+### Edge case — unknown id returns `200` with an empty body
+
+```bash
+curl -s -i https://fakestoreapi.com/products/9999
+```
+
+```http
+HTTP/2 200
+content-type: application/json; charset=utf-8
+content-length: 0
+```
+
+The body is empty, so a naive `res.json()` throws `Unexpected end of JSON input`.
+The API client detects the empty body and maps it to a typed `notfound` error;
+`getProduct` resolves to `null` and the details screen shows a "not found" state
+instead of crashing or retrying forever. This is covered by a test.
+
 ## Technical decisions
 
 - **`fetch` over axios.** One unauthenticated GET host with nothing to intercept
