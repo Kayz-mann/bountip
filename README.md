@@ -39,7 +39,7 @@ Built with **Expo (SDK 57) + expo-router**, **TypeScript**, **Redux Toolkit**
 - **Dark mode** — follows the system appearance.
 - **Haptics** — light feedback on category selection and favourite toggles.
 - **Accessibility** — roles, labels and selected-state on every interactive element.
-- **Tested & linted** — 24 unit + integration tests (Jest + RNTL), TypeScript strict, and a CI pipeline.
+- **Tested & linted** — 30 unit + integration tests (Jest + RNTL), TypeScript strict, and a CI pipeline.
 
 ## Screenshots
 
@@ -270,14 +270,28 @@ The brief explicitly warns against over-engineering, so these were conscious "no
 
 ## Testing
 
-24 tests across 8 suites, focused on behaviour rather than snapshots:
+30 tests across 9 suites, focused on behaviour rather than snapshots:
 
 - **List screen (integration):** network error → retry → **recovery** → empty search — the full user loop in one test.
 - **`useProduct`:** an unknown id returns a 200 with an *empty body*; the hook resolves `null` (not an error), so details show a "not found" state instead of retrying forever.
-- **Filtering:** search (case-insensitive, trimmed), category, and empty-result handling.
+- **Pagination:** `useInfiniteQuery` reveals the first page, then `fetchNextPage` loads more until exhausted.
+- **Filtering:** `filterProducts` for search (case-insensitive, trimmed), category, and empty-result handling.
 - **Debounce:** several rapid changes coalesce into a single update.
 - **Slices:** filters and favourites reducers (including toggle idempotency).
 - **Components:** product card rendering/press, rating half-stars and the absent-rating path.
+
+### Coverage
+
+Generate a report with `yarn test:coverage`. Current top-line coverage:
+
+| Statements | Branches | Functions | Lines |
+| ---------- | -------- | --------- | ----- |
+| ~72% | ~63% | ~74% | ~73% |
+
+Coverage is concentrated on the parts that carry logic — the API/error layer,
+query and filter hooks, and the product components — rather than presentational
+scaffold (splash animation, some static state views). CI runs the suite with
+`--coverage` on every push and pull request.
 
 ## Assumptions & known limitations
 
